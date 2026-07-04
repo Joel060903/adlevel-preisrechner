@@ -4,116 +4,193 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AdLevel Preisrechner</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23161616'/%3E%3Ctext x='50' y='72' font-size='64' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 826 828'%3E%3Crect width='826' height='828' rx='150' fill='%23161616'/%3E%3Cpath d='M426.5 120L120 720L560 460L640 620H720L610 400L660 300L320 520L470 240L560 380L620 340L500 120Z' fill='white'/%3E%3C/svg%3E">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#161616">
 <style>
-  :root{--ink:#161616;--grey:#424242;--muted:#8a8a8a;--line:#e6e6e4;--bg:#f6f6f4;--card:#fff;}
+  :root{
+    --ink:#161616; --grey:#4a4a4a; --muted:#8f8f8f; --line:#e7e7e4;
+    --bg:#f4f4f2; --card:#ffffff; --ring:rgba(22,22,22,.10);
+  }
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
-  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 170px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
-  .brand{font-weight:800;letter-spacing:-.02em;font-size:22px}
-  .brand span{color:var(--muted);font-weight:600}
-  .sub{color:var(--muted);font-size:13px}
-  h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:26px 0 12px;font-weight:700}
+  .logoA{width:1em;height:1em;display:inline-block;vertical-align:-.12em}
+
+  /* ---------- Passwort-Gate ---------- */
+  #gate{position:fixed;inset:0;background:#161616;display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .gatecard{background:#fff;border-radius:20px;padding:34px 30px;width:100%;max-width:360px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+  .gatecard .mark{font-size:44px;color:var(--ink);line-height:1}
+  .gatecard h1{font-size:21px;margin:14px 0 2px;letter-spacing:-.02em}
+  .gatecard p{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .gatecard input{width:100%;height:48px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:16px;text-align:center;outline:none;transition:.15s}
+  .gatecard input:focus{border-color:var(--ink)}
+  .gatecard button{width:100%;height:48px;margin-top:12px;background:var(--ink);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+  .gate-err{color:#c0392b;font-size:13px;height:16px;margin-top:10px;font-weight:600}
+  .shake{animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+  /* ---------- App ---------- */
+  .wrap{max-width:1060px;margin:0 auto;padding:18px 16px 170px}
+  .topbar{background:var(--ink);color:#fff;border-radius:18px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .logoA{font-size:34px;color:#fff}
+  .brand .txt .nm{font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1}
+  .brand .txt .sl{color:#b9b9b9;font-size:12px;margin-top:3px}
+  .topbtns{display:flex;gap:8px}
+  .tb{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:600;font-size:13px;cursor:pointer}
+  .tb:hover{background:rgba(255,255,255,.2)}
+
+  h2{display:flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:28px 0 12px;font-weight:700}
+  h2 .num{width:22px;height:22px;background:var(--ink);color:#fff;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   @media(max-width:760px){.grid{grid-template-columns:1fr}}
-  .pkg{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;position:relative;transition:.15s}
-  .pkg:hover{border-color:#bdbdbd}
-  .pkg.sel{border-color:var(--ink);box-shadow:0 0 0 3px rgba(22,22,22,.08)}
-  .pkg .nm{font-weight:800;font-size:18px}
-  .pkg .pr{margin:8px 0 4px;font-size:15px}
-  .pkg .pr b{font-size:22px}
+  .pkg{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;position:relative;transition:.15s}
+  .pkg:hover{border-color:#c4c4c0;transform:translateY(-1px)}
+  .pkg.sel{border-color:var(--ink);box-shadow:0 0 0 4px var(--ring)}
+  .pkg .nm{font-weight:800;font-size:19px}
+  .pkg .pr{margin:10px 0 2px;font-size:15px}
+  .pkg .pr b{font-size:26px;letter-spacing:-.02em}
   .pkg .setup{color:var(--muted);font-size:13px}
-  .pkg ul{margin:12px 0 0;padding-left:18px;font-size:13px;color:var(--grey)}
-  .pkg li{margin:3px 0}
-  .rec{position:absolute;top:-10px;right:12px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 9px;border-radius:20px}
-  .row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
-  .row.on{border-color:var(--ink);background:#fafafa}
-  .row .cb{width:22px;height:22px;border:1.5px solid #c7c7c4;border-radius:6px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;background:#fff;transition:.12s}
+  .pkg ul{margin:14px 0 0;padding:0;list-style:none;font-size:13px;color:var(--grey)}
+  .pkg li{margin:6px 0;padding-left:22px;position:relative}
+  .pkg li svg{position:absolute;left:0;top:1px;width:14px;height:14px;color:var(--ink)}
+  .rec{position:absolute;top:-11px;right:14px;background:var(--ink);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:4px 11px;border-radius:20px}
+
+  .row{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:.12s}
+  .row:hover{border-color:#cfcfca}
+  .row.on{border-color:var(--ink);background:#fbfbfa;box-shadow:0 0 0 3px var(--ring)}
+  .row .cb{width:23px;height:23px;border:1.6px solid #c7c7c2;border-radius:7px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:#fff;transition:.12s}
+  .row .cb svg{width:14px;height:14px;color:#fff;opacity:0}
   .row.on .cb{background:var(--ink);border-color:var(--ink)}
+  .row.on .cb svg{opacity:1}
   .row .info{flex:1;min-width:0}
   .row .info .t{font-weight:600;font-size:15px}
   .row .info .n{color:var(--muted);font-size:12px;margin-top:2px}
-  .row .price{font-weight:700;white-space:nowrap;font-size:14px}
-  .qty{display:flex;align-items:center;gap:6px;margin-left:4px}
-  .qty button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:16px;cursor:pointer;line-height:1}
-  .qty input{width:44px;text-align:center;border:1px solid var(--line);border-radius:8px;height:28px;font-size:14px}
-  .note{font-size:12px;color:var(--muted);margin:2px 0 0}
-  .foxcard{background:var(--card);border:1px dashed #c9c9c6;border-radius:12px;padding:14px}
-  .segs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
-  .seg{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+  .row .price{font-weight:700;white-space:nowrap;font-size:14.5px}
+  .qty{display:flex;align-items:center;gap:6px}
+  .qty button{width:30px;height:30px;border:1px solid var(--line);background:#fff;border-radius:9px;font-size:17px;cursor:pointer;line-height:1;color:var(--ink)}
+  .qty button:hover{border-color:var(--ink)}
+  .qty input{width:46px;text-align:center;border:1px solid var(--line);border-radius:9px;height:30px;font-size:14px}
+
+  .foxcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .segs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .seg{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:9px 18px;cursor:pointer;font-weight:700;font-size:14px;transition:.12s}
+  .seg:hover{border-color:#c4c4c0}
   .seg.on{border-color:var(--ink);background:var(--ink);color:#fff}
   .foxrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  select{height:36px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font-size:14px;background:#fff}
+  select{height:38px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:14px;background:#fff}
   .foxout{margin-left:auto;text-align:right}
-  .foxout .big{font-weight:800;font-size:18px}
+  .foxout .big{font-weight:800;font-size:20px}
   .foxout .sm{color:var(--muted);font-size:12px}
-  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(0,0,0,.06)}
-  .bar .in{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .stat{display:flex;flex-direction:column;line-height:1.2}
-  .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-  .stat .v{font-size:20px;font-weight:800}
-  .stat .v small{font-size:12px;font-weight:600;color:var(--muted)}
-  .sep{width:1px;height:34px;background:var(--line)}
-  .btn{background:var(--ink);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;font-size:14px}
-  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
-  .say{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px;font-size:14px}
+  .note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
+
+  .say{background:linear-gradient(180deg,#fff,#fbfbfa);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:16px;font-size:14.5px;line-height:1.55}
   .say b{font-weight:800}
   .autofoxline{color:var(--grey);font-size:13px}
-  @media print{.bar{position:static;box-shadow:none}.pkg,.row{break-inside:avoid}}
+
+  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.07)}
+  .bar .in{max-width:1060px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .stat{display:flex;flex-direction:column;line-height:1.2}
+  .stat .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+  .stat .v{font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .stat .v small{font-size:11px;font-weight:600;color:var(--muted)}
+  .stat.hl{background:var(--ink);color:#fff;border-radius:12px;padding:6px 14px}
+  .stat.hl .k{color:#b9b9b9}
+  .sep{width:1px;height:32px;background:var(--line)}
+  @media(max-width:620px){.sep{display:none}.bar .in{gap:10px 16px}}
+
+  @media print{
+    #gate{display:none!important}
+    .bar{position:static;box-shadow:none;background:#fff}
+    .topbtns{display:none}
+    .pkg,.row,.foxcard{break-inside:avoid}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <div class="brand">AdLevel <span>Preisrechner</span></div>
-      <div class="sub">Autohaus-Anfragen-System · Warenkorb fürs Verkaufsgespräch</div>
-    </div>
-    <div>
-      <button class="btn ghost" onclick="resetAll()">Zurücksetzen</button>
-      <button class="btn ghost" onclick="window.print()">Drucken / PDF</button>
-    </div>
-  </header>
 
-  <h2>1. Paket wählen</h2>
+<!-- ===== Passwort-Gate ===== -->
+<div id="gate">
+  <div class="gatecard" id="gatecard">
+    <div class="mark"><svg class="logoA" viewBox="0 0 826 828"><path d="M426.5 0L0 827.5L596 455.5L700 677.5H826L681 385L744 254L279.5 541.5L467.5 158.5L543 341L638.5 280L504.5 0H426.5Z" fill="currentColor"/></svg></div>
+    <h1>AdLevel Preisrechner</h1>
+    <p>Bitte Passwort eingeben</p>
+    <input id="pw" type="password" placeholder="Passwort" autocomplete="current-password" onkeydown="if(event.key==='Enter')tryUnlock()">
+    <div class="gate-err" id="gateErr"></div>
+    <button onclick="tryUnlock()">Entsperren</button>
+  </div>
+</div>
+
+<!-- ===== App ===== -->
+<div class="wrap" id="app" hidden>
+  <div class="topbar">
+    <div class="brand">
+      <svg class="logoA" viewBox="0 0 826 828"><path d="M426.5 0L0 827.5L596 455.5L700 677.5H826L681 385L744 254L279.5 541.5L467.5 158.5L543 341L638.5 280L504.5 0H426.5Z" fill="currentColor"/></svg>
+      <div class="txt"><div class="nm">AdLevel</div><div class="sl">Preisrechner · Autohaus-Anfragen-System</div></div>
+    </div>
+    <div class="topbtns">
+      <button class="tb" onclick="resetAll()">Zurücksetzen</button>
+      <button class="tb" onclick="window.print()">Drucken / PDF</button>
+    </div>
+  </div>
+
+  <h2><span class="num">1</span> Paket wählen</h2>
   <div class="grid" id="pkgs"></div>
 
-  <h2>2. Monatlich dazubuchen</h2>
+  <h2><span class="num">2</span> Monatlich dazubuchen</h2>
   <div id="mon"></div>
 
-  <h2>3. Einmalig dazubuchen</h2>
+  <h2><span class="num">3</span> Einmalig dazubuchen</h2>
   <div id="once"></div>
 
-  <h2>4. AutoFox KI-Fahrzeugbilder (Partner · läuft über AutoFox, nicht über AdLevel-Rechnung)</h2>
+  <h2><span class="num">4</span> AutoFox KI-Fahrzeugbilder <span style="text-transform:none;letter-spacing:0;font-weight:600;color:#b0b0b0">· Partner, läuft über AutoFox</span></h2>
   <div class="foxcard">
     <div class="segs" id="foxProd"></div>
     <div class="foxrow" id="foxRow" style="display:none">
       <label>Fahrzeuge / Monat &nbsp;<select id="foxVol" onchange="setFoxVol(this.value)"></select></label>
       <div class="foxout"><div class="big" id="foxBig">0 €</div><div class="sm" id="foxSm">pro Monat, direkt über AutoFox</div></div>
     </div>
-    <div class="note">Basic = 16 KI-Bilder / Fahrzeug · Premium = 32 KI-Bilder + Spiegel-Neutralisierung + Kennzeichen-Branding. Abo, 12 Monate, Vorauszahlung. AdLevel ist Partner.</div>
+    <div class="note">Basic = 16 KI-Bilder / Fahrzeug · Premium = 32 KI-Bilder + Spiegel-Neutralisierung + Kennzeichen-Branding. Abo, 12 Monate, Vorauszahlung. AdLevel ist Partner, die Abrechnung läuft direkt über AutoFox.</div>
   </div>
 
   <div class="say" id="say"></div>
 </div>
 
-<div class="bar">
+<!-- ===== Summenleiste ===== -->
+<div class="bar" id="statsbar" hidden>
   <div class="in">
     <div class="stat"><span class="k">Einmalig (Setup)</span><span class="v" id="sEinmalig">0 €</span></div>
     <div class="sep"></div>
     <div class="stat"><span class="k">Monatlich AdLevel</span><span class="v" id="sMonat">0 €<small> netto</small></span></div>
     <div class="sep"></div>
-    <div class="stat"><span class="k">Rechnung Monat 1</span><span class="v" id="sMonat1">0 €</span></div>
+    <div class="stat hl"><span class="k">Rechnung Monat 1</span><span class="v" id="sMonat1">0 €</span></div>
     <div class="sep"></div>
     <div class="stat"><span class="k">AutoFox extern / Monat</span><span class="v" id="sFox">0 €</span></div>
   </div>
 </div>
 
 <script>
+/* ---------- Passwort-Gate (leichter Zugriffsschutz, kein echter Serverschutz) ---------- */
+function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=(Math.imul(h,33)+s.charCodeAt(i))>>>0;}return h;}
+const PW_HASH=531643778;
+function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').hidden=false;document.getElementById('statsbar').hidden=false;render();}
+function tryUnlock(){
+  const v=(document.getElementById('pw').value||'').trim().toLowerCase();
+  if(djb2(v)===PW_HASH){localStorage.setItem('adlvl_ok','1');showApp();}
+  else{const c=document.getElementById('gatecard');const e=document.getElementById('gateErr');
+    e.textContent='Falsches Passwort';c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');
+    document.getElementById('pw').select();}
+}
+if(localStorage.getItem('adlvl_ok')==='1'){window.addEventListener('DOMContentLoaded',showApp);}
+else{window.addEventListener('DOMContentLoaded',()=>document.getElementById('pw').focus());}
+
+/* ---------- Icons ---------- */
+const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+/* ---------- Daten ---------- */
 const packages=[
  {id:'basis',nm:'Basis',setup:1500,monthly:1990,feat:['1 Drehtag / Monat vor Ort','4 fertige Reels / Monat','Meta-Ads (Lead-Gewinnung)','Google-Unternehmensprofil','Monats-Reporting']},
  {id:'wachstum',nm:'Wachstum',setup:1990,monthly:2490,rec:true,feat:['Alles aus Basis','6 fertige Reels / Monat','Google Vehicle Ads','Foto-Set fürs Autohaus','AutoFox-Anbindung möglich']},
@@ -151,7 +228,7 @@ function renderPkgs(){
       <div class="nm">${p.nm}</div>
       <div class="pr"><b>${eur(p.monthly)}</b> <small>/ Monat netto</small></div>
       <div class="setup">+ ${eur(p.setup)} Setup einmalig</div>
-      <ul>${p.feat.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <ul>${p.feat.map(f=>`<li>${CHECK}${f}</li>`).join('')}</ul>
     </div>`).join('');
 }
 function renderAddons(list,elId){
@@ -163,7 +240,7 @@ function renderAddons(list,elId){
         <button onclick="step('${a.id}',1)">+</button></div>`:'';
     const unit=a.unit?' / '+a.unit:(a.per?' / '+a.per:'');
     return `<div class="row ${on?'on':''}" onclick="toggle('${a.id}')">
-      <div class="cb">${on?'✓':''}</div>
+      <div class="cb">${CHECK}</div>
       <div class="info"><div class="t">${a.nm}</div>${a.note?`<div class="n">${a.note}</div>`:''}</div>
       ${qtyCtrl}
       <div class="price">${eur(effPrice(a))}${unit}</div>
@@ -220,7 +297,6 @@ function render(){
   }
   document.getElementById('say').innerHTML=s;
 }
-render();
 </script>
 </body>
 </html>
