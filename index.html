@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AdLevel Preisrechner</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23161616'/%3E%3Ctext x='50' y='72' font-size='64' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#161616">
+<style>
+  :root{--ink:#161616;--grey:#424242;--muted:#8a8a8a;--line:#e6e6e4;--bg:#f6f6f4;--card:#fff;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 170px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .brand{font-weight:800;letter-spacing:-.02em;font-size:22px}
+  .brand span{color:var(--muted);font-weight:600}
+  .sub{color:var(--muted);font-size:13px}
+  h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:26px 0 12px;font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .pkg{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;position:relative;transition:.15s}
+  .pkg:hover{border-color:#bdbdbd}
+  .pkg.sel{border-color:var(--ink);box-shadow:0 0 0 3px rgba(22,22,22,.08)}
+  .pkg .nm{font-weight:800;font-size:18px}
+  .pkg .pr{margin:8px 0 4px;font-size:15px}
+  .pkg .pr b{font-size:22px}
+  .pkg .setup{color:var(--muted);font-size:13px}
+  .pkg ul{margin:12px 0 0;padding-left:18px;font-size:13px;color:var(--grey)}
+  .pkg li{margin:3px 0}
+  .rec{position:absolute;top:-10px;right:12px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 9px;border-radius:20px}
+  .row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+  .row.on{border-color:var(--ink);background:#fafafa}
+  .row .cb{width:22px;height:22px;border:1.5px solid #c7c7c4;border-radius:6px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;background:#fff;transition:.12s}
+  .row.on .cb{background:var(--ink);border-color:var(--ink)}
+  .row .info{flex:1;min-width:0}
+  .row .info .t{font-weight:600;font-size:15px}
+  .row .info .n{color:var(--muted);font-size:12px;margin-top:2px}
+  .row .price{font-weight:700;white-space:nowrap;font-size:14px}
+  .qty{display:flex;align-items:center;gap:6px;margin-left:4px}
+  .qty button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:16px;cursor:pointer;line-height:1}
+  .qty input{width:44px;text-align:center;border:1px solid var(--line);border-radius:8px;height:28px;font-size:14px}
+  .note{font-size:12px;color:var(--muted);margin:2px 0 0}
+  .foxcard{background:var(--card);border:1px dashed #c9c9c6;border-radius:12px;padding:14px}
+  .segs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+  .seg{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+  .seg.on{border-color:var(--ink);background:var(--ink);color:#fff}
+  .foxrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  select{height:36px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font-size:14px;background:#fff}
+  .foxout{margin-left:auto;text-align:right}
+  .foxout .big{font-weight:800;font-size:18px}
+  .foxout .sm{color:var(--muted);font-size:12px}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(0,0,0,.06)}
+  .bar .in{max-width:1080px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .stat{display:flex;flex-direction:column;line-height:1.2}
+  .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .stat .v{font-size:20px;font-weight:800}
+  .stat .v small{font-size:12px;font-weight:600;color:var(--muted)}
+  .sep{width:1px;height:34px;background:var(--line)}
+  .btn{background:var(--ink);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;font-size:14px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .say{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px;font-size:14px}
+  .say b{font-weight:800}
+  .autofoxline{color:var(--grey);font-size:13px}
+  @media print{.bar{position:static;box-shadow:none}.pkg,.row{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">AdLevel <span>Preisrechner</span></div>
+      <div class="sub">Autohaus-Anfragen-System · Warenkorb fürs Verkaufsgespräch</div>
+    </div>
+    <div>
+      <button class="btn ghost" onclick="resetAll()">Zurücksetzen</button>
+      <button class="btn ghost" onclick="window.print()">Drucken / PDF</button>
+    </div>
+  </header>
+
+  <h2>1. Paket wählen</h2>
+  <div class="grid" id="pkgs"></div>
+
+  <h2>2. Monatlich dazubuchen</h2>
+  <div id="mon"></div>
+
+  <h2>3. Einmalig dazubuchen</h2>
+  <div id="once"></div>
+
+  <h2>4. AutoFox KI-Fahrzeugbilder (Partner · läuft über AutoFox, nicht über AdLevel-Rechnung)</h2>
+  <div class="foxcard">
+    <div class="segs" id="foxProd"></div>
+    <div class="foxrow" id="foxRow" style="display:none">
+      <label>Fahrzeuge / Monat &nbsp;<select id="foxVol" onchange="setFoxVol(this.value)"></select></label>
+      <div class="foxout"><div class="big" id="foxBig">0 €</div><div class="sm" id="foxSm">pro Monat, direkt über AutoFox</div></div>
+    </div>
+    <div class="note">Basic = 16 KI-Bilder / Fahrzeug · Premium = 32 KI-Bilder + Spiegel-Neutralisierung + Kennzeichen-Branding. Abo, 12 Monate, Vorauszahlung. AdLevel ist Partner.</div>
+  </div>
+
+  <div class="say" id="say"></div>
+</div>
+
+<div class="bar">
+  <div class="in">
+    <div class="stat"><span class="k">Einmalig (Setup)</span><span class="v" id="sEinmalig">0 €</span></div>
+    <div class="sep"></div>
+    <div class="stat"><span class="k">Monatlich AdLevel</span><span class="v" id="sMonat">0 €<small> netto</small></span></div>
+    <div class="sep"></div>
+    <div class="stat"><span class="k">Rechnung Monat 1</span><span class="v" id="sMonat1">0 €</span></div>
+    <div class="sep"></div>
+    <div class="stat"><span class="k">AutoFox extern / Monat</span><span class="v" id="sFox">0 €</span></div>
+  </div>
+</div>
+
+<script>
+const packages=[
+ {id:'basis',nm:'Basis',setup:1500,monthly:1990,feat:['1 Drehtag / Monat vor Ort','4 fertige Reels / Monat','Meta-Ads (Lead-Gewinnung)','Google-Unternehmensprofil','Monats-Reporting']},
+ {id:'wachstum',nm:'Wachstum',setup:1990,monthly:2490,rec:true,feat:['Alles aus Basis','6 fertige Reels / Monat','Google Vehicle Ads','Foto-Set fürs Autohaus','AutoFox-Anbindung möglich']},
+ {id:'premium',nm:'Premium',setup:2490,monthly:3490,feat:['Alles aus Wachstum','1 Recruiting-Kampagne / Jahr inkl.','Mehr Ads-Budget-Management','Priorität bei Terminen']},
+];
+const mon=[
+ {id:'reel',nm:'Zusätzliches Reel',price:150,qty:true,unit:'Reel'},
+ {id:'drehtag',nm:'Zusätzlicher Drehtag / Monat',price:400,qty:true,unit:'Tag'},
+ {id:'gva',nm:'Google Vehicle Ads',price:300,per:'Monat',note:'nur nötig, wenn nicht im Paket enthalten'},
+ {id:'gads',nm:'Google Ads Search-Management',price:300,per:'Monat',note:'zzgl. Werbebudget vom Kunden'},
+ {id:'recL',nm:'Social Recruiting laufend',price:500,per:'Monat',note:'statt Einmal-Kampagne'},
+];
+const once=[
+ {id:'rec',nm:'Recruiting-Kampagne pro offene Stelle',price:5000,priceRetainer:3000,qty:true,unit:'Stelle',note:'mit laufendem Retainer 3.000 € · zzgl. ca. 1.500 € Werbebudget · Garantie: 5 Bewerber in 30 Tagen'},
+ {id:'image',nm:'Imagevideo (professionell, einmalig)',price:1500},
+ {id:'ctag',nm:'Zusätzlicher Content- / Fototag',price:400,qty:true,unit:'Tag'},
+];
+const foxTable={
+ basic:{10:59,20:109,30:149,50:239,75:299,100:359,125:419,150:479,200:599},
+ premium:{10:99,20:179,30:249,50:399,75:499,100:599,125:699,150:799,200:999}
+};
+const foxVols=[10,20,30,50,75,100,125,150,200];
+
+const state={pkg:'wachstum',q:{},fox:{prod:'',vol:30}};
+[...mon,...once].forEach(a=>state.q[a.id]=0);
+
+const eur=n=>Math.round(n).toLocaleString('de-DE')+' €';
+const eur2=n=>n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const effPrice=a=>(a.priceRetainer&&state.pkg)?a.priceRetainer:a.price;
+
+function renderPkgs(){
+  document.getElementById('pkgs').innerHTML=packages.map(p=>`
+    <div class="pkg ${state.pkg===p.id?'sel':''}" onclick="pick('${p.id}')">
+      ${p.rec?'<div class="rec">EMPFEHLUNG</div>':''}
+      <div class="nm">${p.nm}</div>
+      <div class="pr"><b>${eur(p.monthly)}</b> <small>/ Monat netto</small></div>
+      <div class="setup">+ ${eur(p.setup)} Setup einmalig</div>
+      <ul>${p.feat.map(f=>`<li>${f}</li>`).join('')}</ul>
+    </div>`).join('');
+}
+function renderAddons(list,elId){
+  document.getElementById(elId).innerHTML=list.map(a=>{
+    const on=state.q[a.id]>0, q=state.q[a.id];
+    const qtyCtrl=a.qty?`<div class="qty" onclick="event.stopPropagation()">
+        <button onclick="step('${a.id}',-1)">–</button>
+        <input type="number" min="0" value="${q}" onchange="setq('${a.id}',this.value)">
+        <button onclick="step('${a.id}',1)">+</button></div>`:'';
+    const unit=a.unit?' / '+a.unit:(a.per?' / '+a.per:'');
+    return `<div class="row ${on?'on':''}" onclick="toggle('${a.id}')">
+      <div class="cb">${on?'✓':''}</div>
+      <div class="info"><div class="t">${a.nm}</div>${a.note?`<div class="n">${a.note}</div>`:''}</div>
+      ${qtyCtrl}
+      <div class="price">${eur(effPrice(a))}${unit}</div>
+    </div>`;
+  }).join('');
+}
+function renderFox(){
+  const prods=[['','Kein'],['basic','Basic'],['premium','Premium']];
+  document.getElementById('foxProd').innerHTML=prods.map(([id,nm])=>
+    `<div class="seg ${state.fox.prod===id?'on':''}" onclick="setFoxProd('${id}')">${nm}</div>`).join('');
+  const row=document.getElementById('foxRow');
+  if(!state.fox.prod){row.style.display='none';return;}
+  row.style.display='flex';
+  document.getElementById('foxVol').innerHTML=foxVols.map(v=>
+    `<option value="${v}" ${state.fox.vol===v?'selected':''}>${v}</option>`).join('');
+  const m=foxTable[state.fox.prod][state.fox.vol];
+  document.getElementById('foxBig').textContent=eur(m);
+  document.getElementById('foxSm').textContent=`pro Monat, direkt über AutoFox (${eur2(m/state.fox.vol)} / Fahrzeug)`;
+}
+function pick(id){state.pkg=(state.pkg===id?'':id);render()}
+function toggle(id){state.q[id]=state.q[id]>0?0:1;render()}
+function step(id,d){state.q[id]=Math.max(0,(state.q[id]||0)+d);render()}
+function setq(id,v){state.q[id]=Math.max(0,parseInt(v)||0);render()}
+function setFoxProd(p){state.fox.prod=p;render()}
+function setFoxVol(v){state.fox.vol=parseInt(v);render()}
+function resetAll(){state.pkg='';Object.keys(state.q).forEach(k=>state.q[k]=0);state.fox={prod:'',vol:30};render()}
+
+function calc(){
+  const p=packages.find(x=>x.id===state.pkg);
+  let einmalig=p?p.setup:0, monatlich=p?p.monthly:0;
+  const picked=[]; if(p)picked.push('Paket '+p.nm);
+  mon.forEach(a=>{if(state.q[a.id]>0){monatlich+=effPrice(a)*state.q[a.id];picked.push(label(a))}});
+  once.forEach(a=>{if(state.q[a.id]>0){einmalig+=effPrice(a)*state.q[a.id];picked.push(label(a))}});
+  const fox=state.fox.prod?foxTable[state.fox.prod][state.fox.vol]:0;
+  return {einmalig,monatlich,fox,picked};
+}
+function label(a){const q=state.q[a.id];return a.qty&&q>1?`${q}x ${a.nm}`:a.nm}
+
+function render(){
+  renderPkgs();renderAddons(mon,'mon');renderAddons(once,'once');renderFox();
+  const c=calc();
+  document.getElementById('sEinmalig').textContent=eur(c.einmalig);
+  document.getElementById('sMonat').innerHTML=eur(c.monatlich)+'<small> netto</small>';
+  document.getElementById('sMonat1').textContent=eur(c.einmalig+c.monatlich);
+  document.getElementById('sFox').textContent=c.fox>0?'~ '+eur(c.fox):'0 €';
+  let s;
+  if(!c.picked.length&&!c.fox){s='<b>Noch nichts gewählt.</b> Wähle oben ein Paket und optionale Leistungen.';}
+  else{
+    s=`<b>So liest du es dem Kunden vor:</b><br>„Sie bekommen: ${c.picked.join(', ')||'AutoFox'}. `+
+      `Das sind einmalig <b>${eur(c.einmalig)}</b> (Setup und Einmal-Leistungen), danach <b>${eur(c.monatlich)} netto pro Monat</b>. `+
+      `Im ersten Monat also <b>${eur(c.einmalig+c.monatlich)}</b>.“`;
+    if(c.fox>0){const pv=eur2(c.fox/state.fox.vol);
+      s+=`<br><span class="autofoxline">AutoFox ${state.fox.prod==='premium'?'Premium':'Basic'}: <b>${eur(c.fox)} / Monat</b> (${pv} / Fahrzeug, ${state.fox.vol} Fahrzeuge). Läuft separat über AutoFox, nicht über die AdLevel-Rechnung.</span>`;}
+  }
+  document.getElementById('say').innerHTML=s;
+}
+render();
+</script>
+</body>
+</html>
